@@ -7,6 +7,7 @@ package com.biz.metodos;
 
 import com.biz.objetos.ObjPrueba;
 import com.biz.objetos.ObjRol;
+import com.biz.objetos.ObjUsuario;
 import com.jtc.JTC;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -42,6 +43,59 @@ public class metodo_space_principal {
                     obj.setIdRol(rs.getInt(1));
                     obj.setNameRol(rs.getString(2));
                     obj.setState(rs.getString(3));
+
+                    lista.add(obj);
+                }
+            } else {
+                lista = null;
+            }
+        } catch (SQLException ex) {
+            lista = null;
+            ex.printStackTrace();
+        } finally {
+            try {
+                rs.close();
+            } catch (Exception e) {
+            }
+            try {
+                cn.close();
+            } catch (Exception e) {
+            }
+        }
+
+        return lista;
+
+    }
+    
+    
+    
+    public List<ObjUsuario> listarUser(String user, String passw, String token) {
+        String resp = "";
+        String sql = "";
+        List<ObjUsuario> lista = new ArrayList();
+        DataBase dataBase = new DataBase();
+        ResultSet rs = null;
+        Connection cn = null;
+        CallableStatement cs = null;
+        cn = dataBase.getConeccionSpaceApps();
+        JTC jtc = new JTC();
+        ObjUsuario obj = new ObjUsuario();
+
+        try {
+            sql = "EXEC crud_login 'SU', null , '"+user+"', '"+passw+"', null, '" + token + "', null, null, nul, null, null";
+            rs = jtc.execComand(cn, sql);
+            if (rs != null) {
+                while (rs.next()) {
+                    obj = new ObjUsuario();
+                    obj.setIdUser(rs.getInt(1));
+                    obj.setUser(rs.getString(2));
+                    obj.setLast_login(rs.getString(3));
+                    obj.setIs_login(rs.getString(4));
+                    obj.setIs_super_user(rs.getString(5));
+                    obj.setIs_banned(rs.getString(6));
+                    obj.setDate_banned(rs.getString(7));
+                    obj.setIdRol(rs.getInt(8));
+                    obj.setName_rol(rs.getString(9));
 
                     lista.add(obj);
                 }

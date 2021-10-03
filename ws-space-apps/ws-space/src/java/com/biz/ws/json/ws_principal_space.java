@@ -6,6 +6,7 @@
 package com.biz.ws.json;
 
 import com.biz.metodos.metodo_space_principal;
+import com.biz.objetos.ObjUsuario;
 import com.java.MetodoHash.hash;
 import java.io.IOException;
 import java.io.StringReader;
@@ -66,10 +67,11 @@ public class ws_principal_space extends metodo_space_principal {
         return obj.toString();
     }
 
-    private String responseToken(String data, String token) throws JSONException {
+    private String responseToken(String data, String token, List<ObjUsuario> lsUser) throws JSONException {
         JSONObject obj = new JSONObject();
         obj.put("respuesta", data);
         obj.put("token", token);
+        obj.put("usuario", lsUser);
         return obj.toString();
     }
 
@@ -183,6 +185,7 @@ public class ws_principal_space extends metodo_space_principal {
 
         String resp = "";
         String tokenGenera = "";
+        List<ObjUsuario> lsUser = null;
 
         try {
 
@@ -198,19 +201,19 @@ public class ws_principal_space extends metodo_space_principal {
             
             if("LOGIN SUCCES".equals(resp)){
                 
-                
+            lsUser = listarUser(objson.getString("usuario"), hash.sha1(objson.getString("password")), tokenGenera);    
             }else{
                 tokenGenera = "Sesion invalida. Verifique su informacion.";
             }
                 
             
-            return Response.ok(responseToken(resp, tokenGenera), APPLICATION_JSON).status(OK).build();
+            return Response.ok(responseToken(resp, tokenGenera, lsUser), APPLICATION_JSON).status(OK).build();
         } catch (JSONException e) {
             resp = String.valueOf(Response.status(500));
               tokenGenera = "Token no generado";
             e.printStackTrace();
         }
-        return Response.ok(responseToken(resp, tokenGenera), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
+        return Response.ok(responseToken(resp, tokenGenera, lsUser), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
     }
 
     public static String random1() {
