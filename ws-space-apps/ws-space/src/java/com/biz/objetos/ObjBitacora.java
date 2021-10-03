@@ -112,7 +112,23 @@ public class ObjBitacora {
         this.type = type;
     }
     
-    
+    //convert to jsonObject
+    public String toJson(){
+        String json = "{";
+        json += "\"idBitacora\":\""+this.idBitacora+"\",";
+        json += "\"userId\":\""+this.userId+"\",";
+        json += "\"dateModification\":\""+this.dateModification+"\",";
+        json += "\"title\":\""+this.title+"\",";
+        json += "\"description\":\""+this.description+"\",";
+        json += "\"tags\":\""+this.tags+"\",";
+        json += "\"idBitacoraSecundario\":\""+this.idBitacoraSecundario+"\",";
+        json += "\"state\":\""+this.state+"\",";
+        json += "\"idPrototipe\":\""+this.idPrototipe+"\",";
+        json += "\"resource\":\""+this.resource+"\",";
+        json += "\"type\":\""+this.type+"\"";
+        json += "}";
+        return json;
+    }
     
     
 }

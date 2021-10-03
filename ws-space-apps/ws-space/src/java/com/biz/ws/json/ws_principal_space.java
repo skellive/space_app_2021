@@ -172,10 +172,8 @@ public class ws_principal_space extends metodo_space_principal {
         }
         return Response.ok(response(resp), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
     }
-    
-    
-    
-      @POST
+
+    @POST
     @Path("/ws_guardar_bitacora")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
@@ -187,7 +185,7 @@ public class ws_principal_space extends metodo_space_principal {
         try {
 
             resp = guardarBitacora("AA", objson.getInt("userId"), objson.getString("title"), objson.getString("description"), objson.getString("tags"), objson.getInt("idBitacora"),
-                                    objson.getString("state"), objson.getString("resource"), objson.getString("type"), objson.getString("token"));
+                    objson.getString("state"), objson.getString("resource"), objson.getString("type"), objson.getString("token"));
 
             return Response.ok(response(resp), APPLICATION_JSON).status(OK).build();
         } catch (JSONException e) {
@@ -196,8 +194,7 @@ public class ws_principal_space extends metodo_space_principal {
         }
         return Response.ok(response(resp), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
     }
-    
-    
+
     @POST
     @Path("/ws_editar_bitacora")
     @Consumes(APPLICATION_JSON)
@@ -210,7 +207,7 @@ public class ws_principal_space extends metodo_space_principal {
         try {
 
             resp = guardarBitacora("AB", objson.getInt("userId"), objson.getString("title"), objson.getString("description"), objson.getString("tags"), objson.getInt("idBitacora"),
-                                    objson.getString("state"), objson.getString("resource"), objson.getString("type"), objson.getString("token"));
+                    objson.getString("state"), objson.getString("resource"), objson.getString("type"), objson.getString("token"));
 
             return Response.ok(response(resp), APPLICATION_JSON).status(OK).build();
         } catch (JSONException e) {
@@ -219,12 +216,8 @@ public class ws_principal_space extends metodo_space_principal {
         }
         return Response.ok(response(resp), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
     }
-    
-    
-    
-    
-    
-      @POST
+
+    @POST
     @Path("/ws_loguin_usuario")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
@@ -237,35 +230,33 @@ public class ws_principal_space extends metodo_space_principal {
 
         try {
 
-    
-            
             String random1 = random1();
             String random2 = random1();
             String random3 = random1();
-            System.out.println("TOKEN: " + random1+random2+random3);
-            tokenGenera = random1+random2+random3;
+            System.out.println("TOKEN: " + random1 + random2 + random3);
+            tokenGenera = random1 + random2 + random3;
 
             resp = loguinUser(objson.getString("usuario"), hash.sha1(objson.getString("password")), tokenGenera);
-            
-            if("LOGIN SUCCES".equals(resp)){
-                
-            lsUser = listarUser(objson.getString("usuario"), hash.sha1(objson.getString("password")), tokenGenera);    
-            }else{
+
+            if ("LOGIN SUCCES".equals(resp)) {
+
+                lsUser = listarUser(objson.getString("usuario"), hash.sha1(objson.getString("password")), tokenGenera);
+                return Response.ok(responseToken(resp, tokenGenera, lsUser), APPLICATION_JSON).status(OK).build();
+            } else {
                 tokenGenera = "Sesion invalida. Verifique su informacion.";
+                return Response.ok(responseToken(resp, tokenGenera, lsUser), APPLICATION_JSON).status(401).build();
+
             }
-                
-            
-            return Response.ok(responseToken(resp, tokenGenera, lsUser), APPLICATION_JSON).status(OK).build();
+
         } catch (JSONException e) {
             resp = String.valueOf(Response.status(500));
-              tokenGenera = "Token no generado";
+            tokenGenera = "Token no generado";
             e.printStackTrace();
         }
         return Response.ok(responseToken(resp, tokenGenera, lsUser), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
     }
-    
-    
-     @GET
+
+    @GET
     @Path("/ws_listar_bitacora/{userId}/{idBitacora}/{token}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response ws_listar_bitacora(@PathParam("userId") Integer userId, @PathParam("idBitacora") Integer idBitacora, @PathParam("token") String token)
