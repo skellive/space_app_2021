@@ -9,9 +9,14 @@ import com.biz.metodos.metodo_space_principal;
 import com.java.MetodoHash.hash;
 import java.io.IOException;
 import java.io.StringReader;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
@@ -34,12 +39,12 @@ import org.json.JSONObject;
  *
  * @author sistemas01
  */
-
 @Path("/ws_principal_space")
-public class ws_principal_space extends metodo_space_principal{
-    
-    
-     JsonObject objson;
+public class ws_principal_space extends metodo_space_principal {
+
+    JsonObject objson;
+    private static final SecureRandom secureRandom = new SecureRandom();
+    private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
 
     private JsonObject ConverObjJson(String data) {
         JsonReader jsonReader = Json.createReader(new StringReader(data));
@@ -60,26 +65,29 @@ public class ws_principal_space extends metodo_space_principal{
         obj.put("respuesta", data);
         return obj.toString();
     }
-    
-    
+
+    private String responseToken(String data, String token) throws JSONException {
+        JSONObject obj = new JSONObject();
+        obj.put("respuesta", data);
+        obj.put("token", token);
+        return obj.toString();
+    }
+
     /// Link: http://localhost:8080/ws-space/space/ws_principal_space/ws_listar_prueba
-       @GET
+    @GET
     @Path("/ws_listar_rol/{token}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response ws_listar_rol(@PathParam("token")String token)
+    public Response ws_listar_rol(@PathParam("token") String token)
             throws JSONException, SQLException, IOException {
 
         List datos = new ArrayList();
-        
-        
+
         datos = listarRol(token);
-        
 
         return Response.ok(response(datos), MediaType.APPLICATION_JSON).build();
     }
-    
-    
-     @POST
+
+    @POST
     @Path("/ws_guardar_usuario")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
@@ -89,21 +97,18 @@ public class ws_principal_space extends metodo_space_principal{
         String resp = "";
 
         try {
-            
-            
+
             resp = dataUsuario(objson.getString("usuario"), hash.sha1(objson.getString("password")), objson.getInt("idRol"), objson.getString("token"));
 
             return Response.ok(response(resp), APPLICATION_JSON).status(OK).build();
         } catch (JSONException e) {
-            resp = String.valueOf( Response.status(500));
+            resp = String.valueOf(Response.status(500));
             e.printStackTrace();
         }
-       return Response.ok(response(resp), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
+        return Response.ok(response(resp), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
     }
-    
-    
-    
-     @POST
+
+    @POST
     @Path("/ws_guardar_rol")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
@@ -113,20 +118,18 @@ public class ws_principal_space extends metodo_space_principal{
         String resp = "";
 
         try {
-            
-            
+
             resp = dataRol(objson.getString("nameRol"), objson.getString("token"));
 
             return Response.ok(response(resp), APPLICATION_JSON).status(OK).build();
         } catch (JSONException e) {
-            resp = String.valueOf( Response.status(500));
+            resp = String.valueOf(Response.status(500));
             e.printStackTrace();
         }
-       return Response.ok(response(resp), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
+        return Response.ok(response(resp), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
     }
-    
-    
-     @POST
+
+    @POST
     @Path("/ws_actualiza_rol")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
@@ -136,22 +139,18 @@ public class ws_principal_space extends metodo_space_principal{
         String resp = "";
 
         try {
-            
-            
+
             resp = actualizaRol(objson.getInt("idRol"), objson.getString("nameRol"), objson.getString("state"), objson.getString("token"));
 
             return Response.ok(response(resp), APPLICATION_JSON).status(OK).build();
         } catch (JSONException e) {
-            resp = String.valueOf( Response.status(500));
+            resp = String.valueOf(Response.status(500));
             e.printStackTrace();
         }
-       return Response.ok(response(resp), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
+        return Response.ok(response(resp), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
     }
-    
-    
-    
-      
-     @POST
+
+    @POST
     @Path("/ws_actualiza_usuario")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
@@ -161,22 +160,64 @@ public class ws_principal_space extends metodo_space_principal{
         String resp = "";
 
         try {
-            
-            
-            resp = actualizaUsuario(objson.getInt("idUser"),objson.getString("usuario"), hash.sha1(objson.getString("password")), objson.getInt("idRol"), objson.getString("token"),objson.getString("superUser"),objson.getString("isBanned"));
+
+            resp = actualizaUsuario(objson.getInt("idUser"), objson.getString("usuario"), hash.sha1(objson.getString("password")), objson.getInt("idRol"), objson.getString("token"), objson.getString("superUser"), objson.getString("isBanned"));
 
             return Response.ok(response(resp), APPLICATION_JSON).status(OK).build();
         } catch (JSONException e) {
-            resp = String.valueOf( Response.status(500));
+            resp = String.valueOf(Response.status(500));
             e.printStackTrace();
         }
-       return Response.ok(response(resp), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
+        return Response.ok(response(resp), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
     }
     
     
     
     
+      @POST
+    @Path("/ws_loguin_usuario")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response ws_loguin_usuario(String data) throws SQLException, JSONException {
+        objson = ConverObjJson(data);
+
+        String resp = "";
+        String tokenGenera = "";
+
+        try {
+
+    
+            
+            String random1 = random1();
+            String random2 = random1();
+            String random3 = random1();
+            System.out.println("TOKEN: " + random1+random2+random3);
+            tokenGenera = random1+random2+random3;
+
+            resp = loguinUser(objson.getString("usuario"), hash.sha1(objson.getString("password")), tokenGenera);
+            
+            if("LOGIN SUCCES".equals(resp)){
+                
+                
+            }else{
+                tokenGenera = "Sesion invalida. Verifique su informacion.";
+            }
+                
+            
+            return Response.ok(responseToken(resp, tokenGenera), APPLICATION_JSON).status(OK).build();
+        } catch (JSONException e) {
+            resp = String.valueOf(Response.status(500));
+              tokenGenera = "Token no generado";
+            e.printStackTrace();
+        }
+        return Response.ok(responseToken(resp, tokenGenera), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
+    }
+
+    public static String random1() {
+        ///return String.valueOf(Math.random());
+        byte[] randomBytes = new byte[24];
+        secureRandom.nextBytes(randomBytes);
+        return base64Encoder.encodeToString(randomBytes);
+    }
+
 }
-
-
-
