@@ -6,6 +6,8 @@
 package com.biz.metodos;
 
 import com.biz.objetos.ObjBitacora;
+import com.biz.objetos.ObjCabeceraBitacora;
+import com.biz.objetos.ObjDetalleBitacora;
 import com.biz.objetos.ObjPrueba;
 import com.biz.objetos.ObjRol;
 import com.biz.objetos.ObjUsuario;
@@ -68,6 +70,115 @@ public class metodo_space_principal {
 
     }
     
+       public List cabeceraBitacora(Integer userId, String token)throws SQLException {
+        
+        String resp = "";
+        String sql = "";
+        List<ObjCabeceraBitacora> lista = new ArrayList();
+        DataBase dataBase = new DataBase();
+        ResultSet rs = null;
+        Connection cn = null;
+        CallableStatement cs = null;
+        cn = dataBase.getConeccionSpaceApps();
+        JTC jtc = new JTC();
+        ObjCabeceraBitacora obj = new ObjCabeceraBitacora();
+
+        try {
+            sql = "EXEC sp_cabecera_bitacora "+userId+ ",'"+token+"'";
+            rs = jtc.execComand(cn, sql);
+            if (rs != null) {
+                while (rs.next()) {
+                    obj = new ObjCabeceraBitacora();
+                    obj.setId(rs.getInt(1));
+                    obj.setUser_id(rs.getInt(2));
+                    obj.setDate_modification(rs.getString(3));
+                    obj.setTitle(rs.getString(4));
+                    obj.setTags(rs.getString(5));
+                    obj.setId_bitacora(rs.getInt(6));
+                    obj.setState(rs.getString(7));
+                    obj.setUrlDetalle("http://186.70.104.85:8080/ws-space/space/ws_principal_space/ws_listar_detalle_bitacora/"+userId+ "/"+obj.getId_bitacora()+"/"+token);
+
+                    lista.add(obj);
+                }
+            } else {
+                lista = null;
+            }
+        } catch (SQLException ex) {
+            lista = null;
+            ex.printStackTrace();
+        } finally {
+            try {
+                rs.close();
+            } catch (Exception e) {
+            }
+            try {
+                cn.close();
+            } catch (Exception e) {
+            }
+        }
+
+        return lista;
+        
+        
+    }
+    
+    
+    
+    public List detalleBitacora(Integer userId, Integer bitacoraId, String token)throws SQLException {
+ 
+        
+        
+        String resp = "";
+        String sql = "";
+        List<ObjDetalleBitacora> lista = new ArrayList();
+        DataBase dataBase = new DataBase();
+        ResultSet rs = null;
+        Connection cn = null;
+        CallableStatement cs = null;
+        cn = dataBase.getConeccionSpaceApps();
+        JTC jtc = new JTC();
+        ObjDetalleBitacora obj = new ObjDetalleBitacora();
+
+        try {
+            sql = "EXEC sp_detalle_bitacora "+userId+ ","+bitacoraId+",'"+token+"'";
+            rs = jtc.execComand(cn, sql);
+            if (rs != null) {
+                while (rs.next()) {
+                    obj = new ObjDetalleBitacora();
+                    obj.setUser_id(rs.getInt(1));
+                    obj.setDate_modification(rs.getString(2));
+                    obj.setTitle(rs.getString(3));
+                    obj.setTags(rs.getString(4));
+                    obj.setId_bitacora(rs.getInt(5));
+                    obj.setState(rs.getString(6));
+                    obj.setId(rs.getInt(7));
+                    obj.setResource(rs.getString(8));
+                    obj.setType(rs.getString(10));
+
+                    lista.add(obj);
+                }
+            } else {
+                lista = null;
+            }
+        } catch (SQLException ex) {
+            lista = null;
+            ex.printStackTrace();
+        } finally {
+            try {
+                rs.close();
+            } catch (Exception e) {
+            }
+            try {
+                cn.close();
+            } catch (Exception e) {
+            }
+        }
+
+        return lista;
+        
+        
+    }
+            
     
     
     public List<ObjUsuario> listarUser(String user, String passw, String token) {
@@ -163,7 +274,12 @@ public class metodo_space_principal {
 
         return resp;
     }
-
+    
+    
+    
+    
+    
+    
     public String actualizaRol(Integer idRol, String nameRol, String state, String token) {
         String resp = "";
         DataBase dataBase = new DataBase();
