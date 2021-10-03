@@ -1,4 +1,6 @@
 import React from "react";
+import './bitacora.css'
+
 
 const Bitacora = () => {
   return (
