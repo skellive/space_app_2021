@@ -6,6 +6,7 @@
 package com.biz.ws.json;
 
 import com.biz.metodos.metodo_space_principal;
+import com.java.MetodoHash.hash;
 import java.io.IOException;
 import java.io.StringReader;
 import java.sql.SQLException;
@@ -14,12 +15,17 @@ import java.util.List;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import javax.ws.rs.core.Response;
+import static javax.ws.rs.core.Response.Status.OK;
+import static javax.ws.rs.core.Response.Status.PRECONDITION_FAILED;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -71,6 +77,30 @@ public class ws_principal_space extends metodo_space_principal{
 
         return Response.ok(response(datos), MediaType.APPLICATION_JSON).build();
     }
+    
+    
+     @POST
+    @Path("/ws_guardar_usuario")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response ws_guardar_usuario(String data) throws SQLException, JSONException {
+        objson = ConverObjJson(data);
+
+        String resp = "";
+
+        try {
+            
+            
+            resp = dataUsuario(objson.getString("usuario"), hash.sha1(objson.getString("password")), objson.getInt("idRol"), objson.getString("token"));
+
+            return Response.ok(response(resp), APPLICATION_JSON).status(OK).build();
+        } catch (JSONException e) {
+            resp = String.valueOf( Response.status(500));
+            e.printStackTrace();
+        }
+       return Response.ok(response(resp), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
+    }
+    
     
 }
 
