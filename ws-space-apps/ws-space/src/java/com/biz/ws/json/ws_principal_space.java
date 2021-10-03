@@ -175,6 +175,54 @@ public class ws_principal_space extends metodo_space_principal {
     
     
     
+      @POST
+    @Path("/ws_guardar_bitacora")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response ws_guardar_bitacora(String data) throws SQLException, JSONException {
+        objson = ConverObjJson(data);
+
+        String resp = "";
+
+        try {
+
+            resp = guardarBitacora("AA", objson.getInt("userId"), objson.getString("title"), objson.getString("description"), objson.getString("tags"), objson.getInt("idBitacora"),
+                                    objson.getString("state"), objson.getString("resource"), objson.getString("type"), objson.getString("token"));
+
+            return Response.ok(response(resp), APPLICATION_JSON).status(OK).build();
+        } catch (JSONException e) {
+            resp = String.valueOf(Response.status(500));
+            e.printStackTrace();
+        }
+        return Response.ok(response(resp), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
+    }
+    
+    
+    @POST
+    @Path("/ws_editar_bitacora")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response ws_editar_bitacora(String data) throws SQLException, JSONException {
+        objson = ConverObjJson(data);
+
+        String resp = "";
+
+        try {
+
+            resp = guardarBitacora("AB", objson.getInt("userId"), objson.getString("title"), objson.getString("description"), objson.getString("tags"), objson.getInt("idBitacora"),
+                                    objson.getString("state"), objson.getString("resource"), objson.getString("type"), objson.getString("token"));
+
+            return Response.ok(response(resp), APPLICATION_JSON).status(OK).build();
+        } catch (JSONException e) {
+            resp = String.valueOf(Response.status(500));
+            e.printStackTrace();
+        }
+        return Response.ok(response(resp), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
+    }
+    
+    
+    
+    
     
       @POST
     @Path("/ws_loguin_usuario")
@@ -214,6 +262,20 @@ public class ws_principal_space extends metodo_space_principal {
             e.printStackTrace();
         }
         return Response.ok(responseToken(resp, tokenGenera, lsUser), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
+    }
+    
+    
+     @GET
+    @Path("/ws_listar_bitacora/{userId}/{idBitacora}/{token}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response ws_listar_bitacora(@PathParam("userId") Integer userId, @PathParam("idBitacora") Integer idBitacora, @PathParam("token") String token)
+            throws JSONException, SQLException, IOException {
+
+        List datos = new ArrayList();
+
+        datos = listarBitacora(userId, idBitacora, token);
+
+        return Response.ok(response(datos), MediaType.APPLICATION_JSON).build();
     }
 
     public static String random1() {

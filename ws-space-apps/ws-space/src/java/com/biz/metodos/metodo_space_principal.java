@@ -5,6 +5,7 @@
  */
 package com.biz.metodos;
 
+import com.biz.objetos.ObjBitacora;
 import com.biz.objetos.ObjPrueba;
 import com.biz.objetos.ObjRol;
 import com.biz.objetos.ObjUsuario;
@@ -329,6 +330,105 @@ public class metodo_space_principal {
         }
 
         return resp;
+    }
+    
+    
+    
+    public String guardarBitacora(String opcion,Integer userId, String title, String description, String tags, Integer idBitacora, String state, String resource, String type, String token) {
+
+        String resp = "";
+        DataBase dataBase = new DataBase();
+        ResultSet rs = null;
+        Connection con = null;
+        CallableStatement cs = null;
+        con = dataBase.getConeccionSpaceApps();
+        JTC jtc = new JTC();
+
+        try {
+
+            cs = con.prepareCall("{CALL crud_bitacora (?, ? , ?, ?, ?, ?, ?, ?, ?, ?,?)}");
+
+            cs.setString(1, opcion);
+            cs.setInt(2, userId);
+            cs.setString(3, title);
+            cs.setString(4, description);
+            cs.setString(5, tags);
+            cs.setInt(6, idBitacora);
+            cs.setString(7, state);
+            cs.setString(8, resource);
+            cs.setString(9, type);
+            cs.setString(10, token);
+            cs.registerOutParameter(11, java.sql.Types.VARCHAR);
+            cs.execute();
+            resp = cs.getString(11);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                rs.close();
+            } catch (Exception e) {
+            }
+            try {
+                con.close();
+            } catch (Exception e) {
+            }
+        }
+
+        return resp;
+    }
+    
+      public List<ObjBitacora> listarBitacora(Integer userId, Integer idBitacora, String token) {
+        String resp = "";
+        String sql = "";
+        List<ObjBitacora> lista = new ArrayList();
+        DataBase dataBase = new DataBase();
+        ResultSet rs = null;
+        Connection cn = null;
+        CallableStatement cs = null;
+        cn = dataBase.getConeccionSpaceApps();
+        JTC jtc = new JTC();
+        ObjBitacora obj = new ObjBitacora();
+
+        try {
+            sql = "EXEC  crud_bitacora 'AC','"+userId+"', null, null,null,"+ idBitacora+", null, null, null, '"+token+"', null";
+            rs = jtc.execComand(cn, sql);
+            if (rs != null) {
+                while (rs.next()) {
+                    obj = new ObjBitacora();
+                    obj.setIdBitacora(rs.getInt(1));
+                    obj.setUserId(rs.getInt(2));
+                    obj.setDateModification(rs.getString(3));
+                    obj.setTitle(rs.getString(4));
+                    obj.setDescription(rs.getString(5));
+                    obj.setTags(rs.getString(6));
+                    obj.setIdBitacoraSecundario(rs.getInt(7));
+                    obj.setState(rs.getString(8));
+                    obj.setIdPrototipe(rs.getInt(9));
+                    obj.setResource(rs.getString(10));
+                    obj.setType(rs.getString(11));
+
+                    lista.add(obj);
+                }
+            } else {
+                lista = null;
+            }
+        } catch (SQLException ex) {
+            lista = null;
+            ex.printStackTrace();
+        } finally {
+            try {
+                rs.close();
+            } catch (Exception e) {
+            }
+            try {
+                cn.close();
+            } catch (Exception e) {
+            }
+        }
+
+        return lista;
+
     }
 
 }
