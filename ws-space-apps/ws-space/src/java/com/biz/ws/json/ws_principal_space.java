@@ -64,15 +64,15 @@ public class ws_principal_space extends metodo_space_principal{
     
     /// Link: http://localhost:8080/ws-space/space/ws_principal_space/ws_listar_prueba
        @GET
-    @Path("/ws_listar_prueba/")
+    @Path("/ws_listar_rol/{token}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response ws_listar_prueba()
+    public Response ws_listar_rol(@PathParam("token")String token)
             throws JSONException, SQLException, IOException {
 
         List datos = new ArrayList();
         
         
-        datos = listarPrueba();
+        datos = listarRol(token);
         
 
         return Response.ok(response(datos), MediaType.APPLICATION_JSON).build();
@@ -100,6 +100,80 @@ public class ws_principal_space extends metodo_space_principal{
         }
        return Response.ok(response(resp), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
     }
+    
+    
+    
+     @POST
+    @Path("/ws_guardar_rol")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response ws_guardar_rol(String data) throws SQLException, JSONException {
+        objson = ConverObjJson(data);
+
+        String resp = "";
+
+        try {
+            
+            
+            resp = dataRol(objson.getString("nameRol"), objson.getString("token"));
+
+            return Response.ok(response(resp), APPLICATION_JSON).status(OK).build();
+        } catch (JSONException e) {
+            resp = String.valueOf( Response.status(500));
+            e.printStackTrace();
+        }
+       return Response.ok(response(resp), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
+    }
+    
+    
+     @POST
+    @Path("/ws_actualiza_rol")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response ws_actualiza_rol(String data) throws SQLException, JSONException {
+        objson = ConverObjJson(data);
+
+        String resp = "";
+
+        try {
+            
+            
+            resp = actualizaRol(objson.getInt("idRol"), objson.getString("nameRol"), objson.getString("state"), objson.getString("token"));
+
+            return Response.ok(response(resp), APPLICATION_JSON).status(OK).build();
+        } catch (JSONException e) {
+            resp = String.valueOf( Response.status(500));
+            e.printStackTrace();
+        }
+       return Response.ok(response(resp), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
+    }
+    
+    
+    
+      
+     @POST
+    @Path("/ws_actualiza_usuario")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response ws_actualiza_usuario(String data) throws SQLException, JSONException {
+        objson = ConverObjJson(data);
+
+        String resp = "";
+
+        try {
+            
+            
+            resp = actualizaUsuario(objson.getInt("idUser"),objson.getString("usuario"), hash.sha1(objson.getString("password")), objson.getInt("idRol"), objson.getString("token"),objson.getString("superUser"),objson.getString("isBanned"));
+
+            return Response.ok(response(resp), APPLICATION_JSON).status(OK).build();
+        } catch (JSONException e) {
+            resp = String.valueOf( Response.status(500));
+            e.printStackTrace();
+        }
+       return Response.ok(response(resp), APPLICATION_JSON).status(PRECONDITION_FAILED).build();
+    }
+    
+    
     
     
 }
