@@ -183,7 +183,9 @@ public class ws_principal_space extends metodo_space_principal {
         String resp = "";
 
         try {
-
+            
+            
+                
             resp = guardarBitacora("AA", objson.getInt("userId"), objson.getString("title"), objson.getString("description"), objson.getString("tags"), objson.getInt("idBitacora"),
                     objson.getString("state"), objson.getString("resource"), objson.getString("type"), objson.getString("token"));
 
@@ -265,6 +267,21 @@ public class ws_principal_space extends metodo_space_principal {
         List datos = new ArrayList();
 
         datos = listarBitacora(userId, idBitacora, token);
+
+        return Response.ok(response(datos), MediaType.APPLICATION_JSON).build();
+    }
+    
+    
+    //http://186.70.104.85:8080
+     @GET
+    @Path("/ws_listar_detalle_bitacora/{userId}/{idBitacora}/{token}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response ws_listar_detalle_bitacora(@PathParam("userId") Integer userId, @PathParam("idBitacora") Integer idBitacora, @PathParam("token") String token)
+            throws JSONException, SQLException, IOException {
+
+        List datos = new ArrayList();
+
+        datos = detalleBitacora(userId, idBitacora, token);
 
         return Response.ok(response(datos), MediaType.APPLICATION_JSON).build();
     }
