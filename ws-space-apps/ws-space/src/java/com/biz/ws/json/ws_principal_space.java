@@ -8,6 +8,8 @@ package com.biz.ws.json;
 import com.biz.metodos.metodo_space_principal;
 import com.biz.objetos.ObjUsuario;
 import com.java.MetodoHash.hash;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.security.NoSuchAlgorithmException;
@@ -35,6 +37,10 @@ import static javax.ws.rs.core.Response.Status.PRECONDITION_FAILED;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -183,9 +189,7 @@ public class ws_principal_space extends metodo_space_principal {
         String resp = "";
 
         try {
-            
-            
-                
+
             resp = guardarBitacora("AA", objson.getInt("userId"), objson.getString("title"), objson.getString("description"), objson.getString("tags"), objson.getInt("idBitacora"),
                     objson.getString("state"), objson.getString("resource"), objson.getString("type"), objson.getString("token"));
 
@@ -270,10 +274,22 @@ public class ws_principal_space extends metodo_space_principal {
 
         return Response.ok(response(datos), MediaType.APPLICATION_JSON).build();
     }
-    
-    
-    //http://186.70.104.85:8080
-     @GET
+
+    String FILE_DIRECTORY = "/home/anderson/Documentos/";
+
+    @Path("/uploadFile")
+    @POST
+    public ResponseEntity<Object> fileUpload(@RequestParam("File") MultipartFile[] file) throws IOException {
+        File myFile = new File(FILE_DIRECTORY + file[0].getOriginalFilename());
+        myFile.createNewFile();
+        FileOutputStream fos = new FileOutputStream(myFile);
+        fos.write(file[0].getBytes());
+        fos.close();
+        return new ResponseEntity<Object>("The File Uploaded Successfully", HttpStatus.OK);
+    }
+
+//http://186.70.104.85:8080
+    @GET
     @Path("/ws_listar_detalle_bitacora/{userId}/{idBitacora}/{token}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response ws_listar_detalle_bitacora(@PathParam("userId") Integer userId, @PathParam("idBitacora") Integer idBitacora, @PathParam("token") String token)
